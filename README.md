@@ -14,7 +14,7 @@ This project presents the design and implementation of a **linear LED light regu
 The goal of the system is to provide a stable current supply for high‑power LEDs (~350 mA per LED branch), ensuring reliable luminous output while protecting LEDs from thermal runaway and overcurrent conditions.
 
 <p align="center">
-  <img src="docs/images/device_1.jpeg" width="600" alt="Completed Device1">
+  <img src="docs/images/device_2.jpeg" width="600" alt="Completed Device1">
 </p>
 
 ---
@@ -125,7 +125,7 @@ The custom enclosure was designed using CAD software (Tinkercad) specifically fo
 - **Base:** Printed in black for structural contrast.
 
 <p align="center">
-  <img src="docs/images/device_2.jpeg" width="600" alt="Top View of LED Array">
+  <img src="docs/images/device_1.jpeg" width="600" alt="Top View of LED Array">
 </p>
 
 ---
