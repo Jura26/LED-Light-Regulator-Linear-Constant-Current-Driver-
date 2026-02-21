@@ -12,6 +12,8 @@ This project presents the design and implementation of a **linear LED light regu
 
 The goal of the system is to provide a stable current supply for high‑power LEDs (~350 mA per LED branch), ensuring reliable luminous output while protecting LEDs from thermal runaway and overcurrent conditions.
 
+![Completed Device1](docs/images/device_1.jpg)
+
 ---
 
 ## Theory of Operation
@@ -19,135 +21,85 @@ The goal of the system is to provide a stable current supply for high‑power LE
 ### Linear Regulators
 A linear regulator controls output voltage or current by dissipating excess electrical energy in the form of heat through a pass element operating in its linear region.
 
-#### Advantages
+**Advantages:**
 - Simple implementation
 - Low electrical noise
 - High reliability
 - Minimal electromagnetic interference (EMI)
 
-#### Disadvantages
+**Disadvantages:**
 - Low efficiency at higher power levels
 - Power loss proportional to voltage drop across regulator
 - Requires thermal management
 
+![Linear Regulator Concept](docs/images/slide_05_08.png)
 
 ### Switching Regulators (Reference)
-Switching regulators regulate voltage or current by rapidly switching a transistor on and off and transferring energy through inductive or capacitive elements.
+While not used in the final design, switching regulators were analyzed during the research phase. They regulate voltage or current by rapidly switching a transistor on and off and transferring energy through inductive or capacitive elements. This project intentionally uses a **linear regulation approach** due to simplicity and predictable behavior in constant current LED applications.
 
-#### Advantages
-- Higher efficiency
-- Minimal energy loss
-- Can step voltage up or down
-
-#### Disadvantages
-- More complex circuitry
-- Increased cost
-- EMI generation
-
-This project intentionally uses a **linear regulation approach** due to simplicity and predictable behavior in constant current LED applications.
+![Switching Regulator Concept](docs/images/slide_05_07.png)
 
 ---
 
-## LED Voltage Regulation
+## Circuit Design & Regulation
 
-Each high‑power LED used in this system requires approximately:
+### Full System Schematic
+The complete circuit utilizes multiple linear regulators to drive specific branches of the LED array, powered by a 12V DC source.
 
-```
-Forward Voltage (Vf) ≈ 3.5 V
-```
+![Full Circuit Schematic](docs/images/slide_02_02.png)
 
-To obtain the required operating voltage:
+### LED Voltage Requirements
+Each high‑power LED used in this system requires approximately ~3.5V forward voltage. To obtain the required operating voltage, two LEDs are connected **in series**, resulting in a total drop of approximately **7V** per branch.
 
-- Two LEDs are connected **in series**
+### Current Regulation Topology
+High‑power LEDs must be driven using **constant current** rather than constant voltage to prevent thermal runaway. A linear regulator (LM317 family) is configured as a precision current source. 
 
-Therefore:
+The output current is determined by the reference voltage ($V_{ref} \approx 1.25V$) and a sense resistor ($R_1$):
 
-```
-Total LED Forward Voltage:
-V_total ≈ 3.5 V + 3.5 V ≈ 7 V
-```
+$$ I_{out} = \frac{V_{ref}}{R_1} $$
 
-A linear voltage regulator is used in combination with resistors to maintain stable voltage across each LED series branch.
+![Constant Current Configuration](docs/images/slide_02_03.png)
 
----
-
-## LED Current Regulation
-
-High‑power LEDs must be driven using **constant current** rather than constant voltage.
-
-Target operating current per LED branch:
-
-```
-I_branch ≈ 350 mA
-```
-
-System configuration:
-
-- Two identical LED series branches
-- Connected in **parallel**
-
-Total required current:
-
-```
-I_total ≈ 350 mA + 350 mA ≈ 700 mA
-```
-
-A linear regulator configured as a **constant current source** is used to control the current through both parallel branches.
-
-Current regulation is achieved using a sense resistor:
-
-```
-I = Vref / Rsense
-```
-
-Where:
-
-- `I` = output current
-- `Vref` = regulator reference voltage
-- `Rsense` = current sense resistor
+**Configuration:**
+- **Target Current:** ~350 mA per branch
+- **Topology:** Two identical LED series branches connected in parallel
+- **Total Current:** ~700 mA
 
 ---
 
-## Power Dissipation
+## Thermal Management
 
-Since this is a linear system, power dissipated by the regulator is:
+Since this is a linear system, the power dissipated by the regulator is calculated as:
 
-```
-P_loss = (Vin − Vled) × I
-```
+$$ P_{loss} = (V_{in} - V_{led}) \times I $$
 
-This power is converted into heat and must be removed through:
-
-- Heatsinking
-- Airflow ventilation
-- Enclosure thermal design
-
-Ventilation openings are included in the enclosure to improve passive cooling.
+This excess energy is converted into heat. To handle this, the design includes:
+1.  **Heatsinking:** Regulators are mounted to dissipating surfaces.
+2.  **Enclosure Ventilation:** Strategic openings allow inherent convection.
+3.  **Passive Cooling:** The layout promotes airflow without requiring active fans.
 
 ---
 
 ## Enclosure Design
 
-The enclosure was designed using:
+ The custom enclosure was designed using CAD software (Tinkercad) specifically for this electronics assembly.
 
-- Tinkercad CAD software
+![3D CAD Design](docs/images/slide_04_04.png)
 
-Design features:
+**Features:**
+- Separate removable top cover with hex-mesh ventilation
+- Screw‑mounted lid geometry
+- Precision cutouts for LED mounting
+- Integrated power input opening
+- Passive airflow channels
 
-- Separate removable top cover
-- Screw‑mounted lid
-- LED mounting cutouts
-- Ventilation slots
-- Power input opening
-- Fan airflow path
+**Manufacturing:**
+- **Process:** FDM 3D Printing
+- **Material:** PETG/PLA (Heat resistant recommended)
+- **Top Cover:** Printed in white/translucent material for light diffusion considerations.
+- **Base:** Printed in black for structural contrast.
 
-Total design time:
-
-```
-≈ 11 hours
-```
-
-The enclosure was manufactured using a 3D printing process.
+![Top View of LED Array](docs/images/device_2.jpg)
 
 ---
 
@@ -155,64 +107,39 @@ The enclosure was manufactured using a 3D printing process.
 
 | Parameter | Value |
 |-----------|--------|
-| LED Forward Voltage | ~3.5 V |
-| LEDs per Series Branch | 2 |
-| Voltage per Branch | ~7 V |
-| Branch Current | 350 mA |
-| Number of Branches | 2 |
-| Total Current | 700 mA |
-| Regulation Type | Linear Constant Current |
+| **Input Voltage** | 12 V DC |
+| **LED Forward Voltage** | ~3.5 V |
+| **LEDs per Series Branch** | 2 |
+| **Voltage per Branch** | ~7 V |
+| **Branch Current** | 350 mA |
+| **Number of Branches** | 2 |
+| **Total Current** | 700 mA |
+| **Regulation Type** | Linear Constant Current |
 
 ---
 
-## Assembly
+## Assembly Steps
 
-1. Connect LEDs in series pairs
-2. Connect both series pairs in parallel
-3. Install current sense resistor
-4. Mount regulator to heatsink
-5. Insert electronics into enclosure
-6. Route power supply wiring
-7. Secure enclosure lid using screws
+1.  **LED Grouping:** Connect LEDs in series pairs.
+2.  **Branching:** Connect both series pairs in parallel configuration.
+3.  **Sense Resistors:** Install current sense resistors ($R_{sense}$) calculated for 350mA.
+4.  **Heatsink Mounting:** Secure the voltage regulators to the heatsink.
+5.  **Integration:** Insert electronics into the 3D printed enclosure.
+6.  **Wiring:** Route power supply wiring through the rear port.
+7.  **Finalizing:** Secure the enclosure lid using screws.
 
 ---
 
 ## Future Improvements
 
-- Switching regulator implementation for efficiency
-- Active cooling system
-- PWM dimming control
-- Integrated temperature monitoring
-- PCB implementation
-
----
-
-# Project Images
-
-## Presentation Images
-
-![](docs/images/slide_01_01.jpg)
-![](docs/images/slide_02_02.png)
-![](docs/images/slide_02_03.png)
-![](docs/images/slide_04_04.png)
-![](docs/images/slide_04_05.png)
-![](docs/images/slide_04_06.png)
-![](docs/images/slide_05_07.png)
-![](docs/images/slide_05_08.png)
-![](docs/images/slide_05_09.png)
-![](docs/images/slide_07_10.jpg)
-![](docs/images/slide_07_11.jpg)
-
----
-
-## Real Device Photos
-
-![](docs/images/device_1.jpg)
-![](docs/images/device_2.jpg)
+- **Efficiency:** Implementation of a switching regulator (Buck converter) to reduce heat.
+- **Cooling:** Addition of a dedicated active cooling fan.
+- **Control:** PWM dimming control implementation.
+- **Safety:** Integrated temperature monitoring and auto-shutdown.
+- **Production:** Conversion from perfboard to a custom PCB.
 
 ---
 
 ## License
 
 This project is released for educational and research purposes.
-
